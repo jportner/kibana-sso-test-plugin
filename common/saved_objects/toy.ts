@@ -24,7 +24,7 @@ export const toySavedObjectType: SavedObjectsType = {
   hidden: false,
   namespaceType: 'multiple',
   management: {
-    // icon: 'visualizeApp',
+    icon: 'beaker',
     defaultSearchField: 'title',
     importableAndExportable: true,
     getTitle(obj) {
