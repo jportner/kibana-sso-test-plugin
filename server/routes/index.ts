@@ -82,7 +82,10 @@ export function defineRoutes(router: IRouter, toyClient: ToyClient) {
         'Hamm',
       ];
       const description = `Created on ${moment().format('lll')}`;
-      const toys = toyNames.map((title) => ({ title, description }));
+      const toys = toyNames.map((title) => ({
+        title: `${title} #${Math.floor(Math.random() * 1000) + 1}`,
+        description,
+      }));
       return await wrap(response, () => toyClient.bulkCreate(request, toys));
     }
   );
