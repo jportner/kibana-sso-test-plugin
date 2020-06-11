@@ -22,6 +22,7 @@ import { schema, TypeOf } from '@kbn/config-schema';
 export const toySchema = schema.object({
   title: schema.string({ minLength: 1 }),
   description: schema.string({ minLength: 1 }),
+  originId: schema.maybe(schema.string({ minLength: 1 })),
 });
 
 export type ToySchemaType = TypeOf<typeof toySchema>;

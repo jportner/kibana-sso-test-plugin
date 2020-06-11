@@ -22,7 +22,7 @@ import moment from 'moment';
 import { IRouter } from '../../../../src/core/server';
 import { ToyClient } from '../lib/toy_client';
 import { KibanaResponseFactory } from '../../../../src/core/server/http/router';
-import { toySchema } from '../../common/toy_schema';
+import { toySchema, ToySchemaType } from '../../common/toy_schema';
 
 const TOY_PATH = '/api/barney/toy';
 
@@ -82,10 +82,17 @@ export function defineRoutes(router: IRouter, toyClient: ToyClient) {
         'Hamm',
       ];
       const description = `Created on ${moment().format('lll')}`;
-      const toys = toyNames.map((title) => ({
+      const toys: ToySchemaType[] = toyNames.map((title) => ({
         title: `${title} #${Math.floor(Math.random() * 1000) + 1}`,
         description,
       }));
+      for (let i = 0; i < 4; i++) {
+        toys.push({
+          title: `Army Man #${Math.floor(Math.random() * 1000) + 1}`,
+          description: `Created on ${moment().format('lll')}`,
+          originId: 'toyarmymanoriginid',
+        });
+      }
       return await wrap(response, () => toyClient.bulkCreate(request, toys));
     }
   );

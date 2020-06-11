@@ -49,7 +49,11 @@ export class ToyClient {
   };
 
   bulkCreate = async (request: KibanaRequest, toys: ToySchemaType[]) => {
-    const objects = toys.map((attributes) => ({ type: this.TYPE, attributes }));
+    const objects = toys.map(({ originId, ...attributes }) => ({
+      type: this.TYPE,
+      attributes,
+      ...(originId && { originId }),
+    }));
     return this.getClient(request).bulkCreate(objects);
   };
 
