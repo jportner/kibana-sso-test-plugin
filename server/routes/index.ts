@@ -85,6 +85,7 @@ export function defineRoutes(router: IRouter, toyClient: ToyClient) {
       const toys: ToySchemaType[] = toyNames.map((title) => ({
         title: `${title} #${Math.floor(Math.random() * 1000) + 1}`,
         description,
+        ...(title === 'Slinky Dog' && { initialNamespaces: ['*'] }),
       }));
       for (let i = 0; i < 4; i++) {
         toys.push({
