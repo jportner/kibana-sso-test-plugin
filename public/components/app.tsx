@@ -7,7 +7,6 @@
  */
 
 import React, { Component } from 'react';
-import { FormattedMessage, I18nProvider } from '@kbn/i18n/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 import {
@@ -21,11 +20,15 @@ import {
   EuiPageHeader,
   EuiTitle,
   EuiText,
+  EuiButtonEmpty,
+  EuiFlexGroup,
+  EuiFlexItem,
 } from '@elastic/eui';
 
 import { ToySchemaType } from '../../common/toy_schema';
 import { CoreStart, SavedObject } from '../../../../src/core/public';
 import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/public';
+import type { SpacesOssPluginStart } from '../../../../src/plugins/spaces_oss/public';
 
 import { PLUGIN_ID, PLUGIN_NAME } from '../../common';
 
@@ -34,6 +37,7 @@ interface Props {
   notifications: CoreStart['notifications'];
   http: CoreStart['http'];
   navigation: NavigationPublicPluginStart;
+  spacesOss: SpacesOssPluginStart;
 }
 
 interface State {
@@ -50,65 +54,77 @@ export class BarneyApp extends Component<Props, State> {
     const toys = await this.props.http.get('/api/barney/toy');
     this.setState({ toys });
   };
-  onClickHandler = async () => {
+  clickGetNewToys = async () => {
     // Use the core http service to make a response to the server API.
     await this.props.http.post('/api/barney/toy/sample-data');
     this.refreshData();
   };
+  clickShowToast = async () => {
+    const { spacesOss } = this.props;
+    if (spacesOss.isSpacesAvailable) {
+      await spacesOss.ui.redirectLegacyUrl('#foo');
+    }
+  };
 
   public render() {
-    const { basename, navigation } = this.props;
+    const { basename, navigation, spacesOss } = this.props;
+    const LegacyUrlConflict = spacesOss.isSpacesAvailable
+      ? spacesOss.ui.components.LegacyUrlConflict
+      : () => <></>;
     // Render the application DOM.
     // Note that `navigation.ui.TopNavMenu` is a stateful component exported on the `navigation` plugin's start contract.
     return (
       <Router basename={basename}>
-        <I18nProvider>
-          <>
-            <navigation.ui.TopNavMenu appName={PLUGIN_ID} showSearchBar={true} />
-            <EuiPage restrictWidth="1000px">
-              <EuiPageBody>
-                <EuiPageHeader>
-                  <EuiTitle size="l">
-                    <h1>
-                      <FormattedMessage
-                        id="barney.title"
-                        defaultMessage="{name}"
-                        values={{ name: PLUGIN_NAME }}
-                      />
-                    </h1>
-                  </EuiTitle>
-                </EuiPageHeader>
-                <EuiPageContent>
-                  <EuiPageContentHeader>
-                    <EuiTitle>
-                      <h2>
-                        <FormattedMessage
-                          id="barney.subtitle"
-                          defaultMessage="Sharing is caring!"
-                        />
-                      </h2>
-                    </EuiTitle>
-                  </EuiPageContentHeader>
-                  <EuiPageContentBody>
-                    <EuiText>
-                      <ol>
-                        {this.state.toys.map((toy, index) => (
-                          <li key={index}>
-                            {toy.attributes.title} / {toy.attributes.description} ({toy.id})
-                          </li>
-                        ))}
-                      </ol>
-                      <EuiHorizontalRule />
-                      <EuiButton type="primary" size="s" onClick={this.onClickHandler}>
-                        <FormattedMessage id="barney.buttonText" defaultMessage="Get new toys" />
+        <navigation.ui.TopNavMenu appName={PLUGIN_ID} showSearchBar={true} />
+        <EuiPage restrictWidth="1000px">
+          <EuiPageBody>
+            <EuiPageHeader>
+              <EuiTitle size="l">
+                <h1>{PLUGIN_NAME}</h1>
+              </EuiTitle>
+            </EuiPageHeader>
+            <EuiPageContent>
+              <EuiPageContentHeader>
+                <EuiTitle>
+                  <h2>Sharing is caring!</h2>
+                </EuiTitle>
+              </EuiPageContentHeader>
+
+              <LegacyUrlConflict
+                currentObjectId={'123'}
+                otherObjectId={'456'}
+                otherObjectPath={'#otherobject'}
+              />
+
+              <EuiPageContentBody>
+                <EuiText>
+                  <ol>
+                    {this.state.toys.map((toy, index) => (
+                      <li key={index}>
+                        {toy.attributes.title} / {toy.attributes.description} ({toy.id})
+                      </li>
+                    ))}
+                  </ol>
+                  <EuiHorizontalRule />
+
+                  <EuiFlexGroup gutterSize="s" alignItems="center">
+                    <EuiFlexItem grow={false}>
+                      <EuiButton color="primary" size="s" onClick={this.clickGetNewToys}>
+                        Get new toys
                       </EuiButton>
-                    </EuiText>
-                  </EuiPageContentBody>
-                </EuiPageContent>
-              </EuiPageBody>
-            </EuiPage>
-          </>
-        </I18nProvider>
+                    </EuiFlexItem>
+
+                    <EuiFlexItem grow={false}>
+                      <EuiButtonEmpty color="primary" size="s" onClick={this.clickShowToast}>
+                        Show redirectLegacyUrl toast
+                      </EuiButtonEmpty>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiText>
+              </EuiPageContentBody>
+            </EuiPageContent>
+          </EuiPageBody>
+        </EuiPage>
       </Router>
     );
   }

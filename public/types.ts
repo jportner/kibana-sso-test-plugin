@@ -7,6 +7,7 @@
  */
 
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
+import type { SpacesOssPluginStart } from '../../../src/plugins/spaces_oss/public';
 
 export interface BarneyPluginSetup {
   getGreeting: () => string;
@@ -16,4 +17,5 @@ export interface BarneyPluginStart {}
 
 export interface AppPluginStartDependencies {
   navigation: NavigationPublicPluginStart;
+  spacesOss: SpacesOssPluginStart;
 }

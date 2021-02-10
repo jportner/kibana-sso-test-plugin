@@ -14,7 +14,7 @@ import { BarneyApp } from './components/app';
 
 export const renderApp = (
   { notifications, http }: CoreStart,
-  { navigation }: AppPluginStartDependencies,
+  { navigation, spacesOss }: AppPluginStartDependencies,
   { appBasePath, element }: AppMountParameters
 ) => {
   ReactDOM.render(
@@ -23,6 +23,7 @@ export const renderApp = (
       notifications={notifications}
       http={http}
       navigation={navigation}
+      spacesOss={spacesOss}
     />,
     element
   );
